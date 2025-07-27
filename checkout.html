@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Checkout</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1 id="game-title">Loading...</h1>
+  <form id="form">
+    <label>Nominal (Rp)
+      <select id="nominal">
+        <option value="5000">5.000</option>
+        <option value="10000">10.000</option>
+        <option value="20000">20.000</option>
+        <option value="50000">50.000</option>
+      </select>
+    </label>
+
+    <label>User ID
+      <input id="userId" required />
+    </label>
+
+    <label>Server / Zone
+      <input id="zone" required />
+    </label>
+
+    <button type="submit">Bayar via Tripay</button>
+  </form>
+
+<script>
+  const url = new URLSearchParams(location.search);
+  const game = url.get('game');
+  const titleMap = { ml: 'Mobile Legends', ff: 'Free Fire', gi: 'Genshin Impact' };
+  document.getElementById('game-title').textContent = titleMap[game];
+
+  document.getElementById('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nominal = document.getElementById('nominal').value;
+    const userId = document.getElementById('userId').value;
+    const zone = document.getElementById('zone').value;
+
+    const res = await fetch('/api/create-invoice', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ game, nominal, userId, zone })
+    });
+    const { checkout_url } = await res.json();
+    location.href = checkout_url;
+  });
+</script>
+</body>
+</html>
